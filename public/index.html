@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Trip Bill Split</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a ledger. Add-bill bar on top, bill rows with per-person share columns, then balances + settle-up. */
+:root{
+  --bg:#f3f5f2; --surface:#ffffff; --ink:#15231f; --muted:#5d6e68; --line:#dbe2de;
+  --accent:#0f6b5a; --accent-ink:#ffffff; --accent-soft:#dcefe9;
+  --chip:#eef2f0; --pos:#1a7f45; --neg:#c0392b; --pos-soft:#e3f4e9; --neg-soft:#fbe7e4;
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Figtree",ui-sans-serif,system-ui,sans-serif;
+  --f-num:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1715; --surface:#16211e; --ink:#e6eeeb; --muted:#93a59f; --line:#26332f;
+  --accent:#3fbfa2; --accent-ink:#06201a; --accent-soft:#183a32;
+  --chip:#1d2a26; --pos:#5fd38d; --neg:#ff7d6e; --pos-soft:#173526; --neg-soft:#3a1d19; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1715; --surface:#16211e; --ink:#e6eeeb; --muted:#93a59f; --line:#26332f;
+  --accent:#3fbfa2; --accent-ink:#06201a; --accent-soft:#183a32;
+  --chip:#1d2a26; --pos:#5fd38d; --neg:#ff7d6e; --pos-soft:#173526; --neg-soft:#3a1d19; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45}
+.wrap{max-width:1100px;margin:0 auto;padding-block:28px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px}
+header{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,5vw,40px);margin:0;letter-spacing:-.02em;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0}
+.total{text-align:right}
+.total .lbl{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.total .num{font-family:var(--f-num);font-weight:700;font-size:28px}
+h2{font-family:var(--f-display);font-weight:600;font-size:20px;margin:0 0 10px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+.num,.mono{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+/* form */
+form{display:grid;gap:14px}
+.row{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px}
+@media (max-width:640px){.row{grid-template-columns:1fr 1fr}.row .item{grid-column:1/-1}}
+label{display:grid;gap:5px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+input,select{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;width:100%;min-width:0;text-transform:none;letter-spacing:0}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{font:inherit;font-weight:600;font-size:14px;border:1px solid var(--line);background:var(--chip);color:var(--muted);border-radius:999px;padding:7px 14px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.chip[aria-pressed="true"]::before{content:"✓";color:var(--accent);font-weight:700}
+.chip.ghost{background:transparent;border-style:dashed}
+.hint{font-size:13px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:500}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{font:inherit;font-weight:700;border:0;border-radius:8px;padding:11px 20px;cursor:pointer;background:var(--accent);color:var(--accent-ink)}
+.btn.sec{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.err{color:var(--neg);font-size:14px;font-weight:600}
+/* table */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:780px}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;background:var(--bg)}
+th.l,td.l{text-align:left}
+td.item{white-space:normal;min-width:150px;font-weight:600}
+td.zero{color:var(--muted);opacity:.5}
+td.share{font-family:var(--f-num)}
+tfoot td{font-weight:700;background:var(--bg);border-bottom:0}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--chip);color:var(--muted);font-weight:600}
+.payer{font-weight:600}
+.rowbtn{font:inherit;font-size:13px;background:none;border:0;color:var(--muted);cursor:pointer;padding:4px 6px;border-radius:6px}
+.rowbtn:hover{color:var(--ink);background:var(--chip)}
+.rowbtn.danger{color:var(--neg)}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+/* balances */
+.grid2{display:grid;grid-template-columns:3fr 2fr;gap:22px}
+@media (max-width:820px){.grid2{grid-template-columns:1fr}}
+.people{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.person{border:1px solid var(--line);border-radius:10px;padding:12px;display:grid;gap:4px;background:var(--surface)}
+.person .name{font-weight:700;font-size:16px}
+.kv{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+.kv b{font-family:var(--f-num);color:var(--ink);font-weight:500}
+.status{margin-top:6px;font-weight:700;font-size:14px;padding:5px 10px;border-radius:8px;text-align:center}
+.status.pos{background:var(--pos-soft);color:var(--pos)}
+.status.neg{background:var(--neg-soft);color:var(--neg)}
+.status.ok{background:var(--chip);color:var(--muted)}
+.settle{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.settle li{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface)}
+.settle .who{font-weight:600}
+.settle .arrow{color:var(--muted)}
+.settle .amt{font-family:var(--f-num);font-weight:700;color:var(--neg)}
+.note{font-size:13px;color:var(--muted);margin:8px 0 0}
+.sync{font-size:12px;color:var(--muted)}
+:root{--hl:#fff1b8;--hl-ink:#8a6400}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--hl:#3b3112;--hl-ink:#f5c84c}}
+:root[data-theme="dark"]{--hl:#3b3112;--hl-ink:#f5c84c}
+tr.hl td{background:var(--hl)}
+.star{font-size:17px;line-height:1;color:var(--muted);opacity:.55}
+.star[aria-pressed="true"]{color:var(--hl-ink);opacity:1}
+.hdr-actions{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.savebar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+.savebar .state{font-weight:600}
+.savebar .state.dirty{color:var(--hl-ink)}
+.savebar .state.ok{color:var(--pos)}
+.linkbtn{font:inherit;font-size:13px;font-weight:600;background:none;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 12px;cursor:pointer}
+.linkbtn:hover{background:var(--chip)}
+.toast{font-size:13px;color:var(--muted);min-height:1em}
+.legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--muted);margin:0 0 10px}
+.sw{display:inline-block;width:14px;height:14px;border-radius:3px;background:var(--hl);border:1px solid var(--line);vertical-align:-2px;margin-right:5px}
+@media (prefers-reduced-motion:no-preference){.chip,.btn{transition:background .15s,border-color .15s}}
+.signin{background:var(--neg-soft);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-weight:600}
+/* phones: bills become cards */
+@media (max-width:700px){
+  .wrap{padding-block:16px 40px;gap:16px}
+  header{align-items:flex-start}
+  .hdr-actions{align-items:stretch;width:100%}
+  .total{text-align:left;display:flex;justify-content:space-between;align-items:baseline}
+  .btnrow{justify-content:stretch}
+  .btnrow .btn{flex:1}
+  .savebar{padding:12px}
+  .savebar .btnrow{width:100%}
+  .savebar .linkbtn{flex:1}
+  .tbl{border:0;background:none;overflow:visible}
+  table{min-width:0}
+  thead{display:none}
+  table,tbody,tfoot,tr,td{display:block;width:100%}
+  tbody tr{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px;display:grid;grid-template-columns:repeat(5,1fr);gap:2px 6px}
+  tbody tr.hl{background:var(--hl)}
+  tr.hl td{background:none}
+  td{border:0;padding:3px 0;white-space:normal;text-align:left}
+  td.c-num{display:none}
+  td.item{grid-column:1/4;font-size:16px;min-width:0}
+  td.c-amt{grid-column:4/6;text-align:right;font-size:16px;font-weight:700}
+  td.payer{grid-column:1/3;font-size:13px;color:var(--muted);font-weight:500}
+  td.payer::before{content:"Paid by ";}
+  td.c-who{grid-column:3/6;text-align:right}
+  td.share{font-size:13px;text-align:center;background:var(--bg);border-radius:6px;padding:4px 2px;margin-top:6px}
+  td.share::before{content:attr(data-label);display:block;font-family:var(--f-body);font-size:11px;color:var(--muted);font-weight:600;overflow:hidden;text-overflow:ellipsis}
+  td.zero{opacity:.45}
+  td.c-act{grid-column:1/-1;display:flex;justify-content:flex-end;gap:6px;border-top:1px solid var(--line);margin-top:8px;padding-top:6px}
+  .rowbtn{padding:8px 10px;font-size:14px}
+  tbody td.empty{grid-column:1/-1;text-align:center}
+  tfoot tr{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  tfoot td{background:none}
+  tfoot td.blank{display:none}
+  tfoot td.c-tl{grid-column:1/4;text-align:left}
+  tfoot td.c-tt{grid-column:4/6;text-align:right}
+  .people{grid-template-columns:1fr 1fr}
+  input,select{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Trip Bill Split</h1>
+      <p class="sub">Akash · Nitish · Badal · Suraj · Abhiraj <span class="sync" id="sync"></span></p>
+    </div>
+    <div class="hdr-actions">
+      <div class="total"><div class="lbl">Trip total</div><div class="num" id="tripTotal">₹0</div></div>
+      <div class="btnrow">
+        <button class="btn" type="button" id="saveBtn">Refresh</button>
+        <button class="btn sec" type="button" id="xlsxBtn">Download Excel</button>
+      </div>
+      <span class="toast" id="toast" role="status"></span>
+    </div>
+  </header>
+
+  <div class="savebar">
+    <span class="state" id="saveState">Loading your bills…</span>
+  </div>
+
+  <section class="panel">
+    <h2 id="formTitle">Add a bill</h2>
+    <form id="f" autocomplete="off">
+      <div class="row">
+        <label class="item">Item / work<input id="item" placeholder="Cab, dinner, hotel…" maxlength="80"></label>
+        <label>Amount (₹)<input id="amount" type="number" inputmode="decimal" min="0" step="any" placeholder="0"></label>
+        <label>Paid by<select id="paidBy"></select></label>
+      </div>
+      <label>Charged to <span class="hint">tap names to include or remove them</span>
+        <div class="chips" id="chips"></div>
+      </label>
+      <div class="actions">
+        <button class="btn" type="submit" id="submitBtn">Add bill</button>
+        <button class="btn sec" type="button" id="cancelEdit" hidden>Cancel edit</button>
+        <span class="hint" id="preview"></span>
+        <span class="err" id="err"></span>
+      </div>
+    </form>
+  </section>
+
+  <section>
+    <h2>All bills</h2>
+    <p class="legend"><span><span class="sw"></span>Highlighted spend</span><span>Tap ★ on a bill to highlight it. Highlights carry into the Excel file.</span><span id="hlTotal"></span></p>
+    <div class="tbl"><table>
+      <thead><tr id="thead"></tr></thead>
+      <tbody id="tbody"></tbody>
+      <tfoot><tr id="tfoot"></tr></tfoot>
+    </table></div>
+  </section>
+
+  <section class="grid2">
+    <div><h2>Who stands where</h2><div class="people" id="people"></div></div>
+    <div><h2>Settle up</h2><ul class="settle" id="settle"></ul>
+      <p class="note">Fewest payments needed to make everyone even.</p></div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script>
+const NAMES=["Akash","Nitish","Badal","Suraj","Abhiraj"];
+const $=id=>document.getElementById(id);
+const fmt=n=>"₹"+Math.round(n).toLocaleString("en-IN");
+let bills=[], editingId=null, pendingDelete=null, online=false;
+let selected=new Set(NAMES);
+const timeStr=d=>d.toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"});
+function setState(kind,text){const s=$("saveState");s.className="state "+kind;s.textContent=text;}
+
+// ---------- form ----------
+$("paidBy").innerHTML='<option value="">Select…</option>'+NAMES.map(n=>`<option>${n}</option>`).join("");
+function drawChips(){
+  const c=$("chips"); c.textContent="";
+  NAMES.forEach(n=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=n;
+    b.setAttribute("aria-pressed",selected.has(n));b.onclick=()=>{selected.has(n)?selected.delete(n):selected.add(n);drawChips();};c.appendChild(b);});
+  const all=document.createElement("button");all.type="button";all.className="chip ghost";
+  const isAll=selected.size===NAMES.length; all.textContent=isAll?"Clear all":"Select all 5";
+  all.onclick=()=>{selected=isAll?new Set():new Set(NAMES);drawChips();};c.appendChild(all);
+  updatePreview();
+}
+function updatePreview(){
+  const a=parseFloat($("amount").value);
+  $("preview").textContent=(a>0&&selected.size)?`${fmt(a/selected.size)} each for ${selected.size} ${selected.size===1?"person":"people"}`:"";
+}
+$("amount").addEventListener("input",updatePreview);
+function resetForm(){
+  editingId=null;$("f").reset();selected=new Set(NAMES);drawChips();
+  $("formTitle").textContent="Add a bill";$("submitBtn").textContent="Add bill";$("cancelEdit").hidden=true;$("err").textContent="";
+}
+$("cancelEdit").onclick=resetForm;
+$("f").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const item=$("item").value.trim(), amount=parseFloat($("amount").value), paidBy=$("paidBy").value;
+  if(!item) return $("err").textContent="Add what the bill was for.";
+  if(!(amount>0)) return $("err").textContent="Enter an amount above 0.";
+  if(!paidBy) return $("err").textContent="Pick who paid.";
+  if(!selected.size) return $("err").textContent="Pick at least one person to charge.";
+  const old=editingId?bills.find(b=>b.id===editingId):null;
+  const bill={...(old||{}),id:editingId||("b"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)),
+    item,amount:Math.round(amount*100)/100,paidBy,charged:NAMES.filter(n=>selected.has(n)),createdAt:old?old.createdAt:Date.now()};
+  $("err").textContent="";
+  $("submitBtn").disabled=true;
+  try{ await saveBill(bill); resetForm(); }
+  catch(err){ $("err").textContent="Couldn't save. Check your internet and try again."; }
+  $("submitBtn").disabled=false;
+});
+
+// ---------- server ----------
+async function api(method,body,query=""){
+  const r=await fetch("/api/bills"+query,{method,headers:{"content-type":"application/json"},body:body?JSON.stringify(body):undefined,cache:"no-store"});
+  if(!r.ok) throw new Error((await r.text())||r.status);
+  return r.json();
+}
+async function load(quiet){
+  try{
+    const j=await api("GET"); bills=j.bills; online=true; render();
+    setState("ok",`✓ ${bills.length} bills saved · updated ${timeStr(new Date())} · everyone with the link sees the same list`);
+    try{localStorage.setItem("tripBills",JSON.stringify(bills));}catch(e){}
+  }catch(e){
+    online=false;
+    if(!quiet){ try{bills=JSON.parse(localStorage.getItem("tripBills")||"[]");}catch(_){} render(); }
+    setState("dirty","Can't reach the server right now. Showing the last copy on this device.");
+  }
+}
+async function saveBill(bill){
+  setState("dirty","Saving…");
+  const i=bills.findIndex(b=>b.id===bill.id); i>=0?bills[i]=bill:bills.push(bill); render();
+  try{ await api("POST",bill); await load(true); }
+  catch(e){ await load(true); throw e; }
+}
+async function removeBill(id){
+  setState("dirty","Deleting…");
+  bills=bills.filter(b=>b.id!==id); render();
+  try{ await api("DELETE",null,"?id="+encodeURIComponent(id)); }catch(e){}
+  await load(true);
+}
+$("saveBtn").onclick=()=>{setState("dirty","Refreshing…");load();};
+setInterval(()=>{ if(!document.hidden && !editingId) load(true); },15000);
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden) load(true); });
+
+// ---------- maths ----------
+function share(b,n){return b.charged.includes(n)?b.amount/b.charged.length:0;}
+function balances(){
+  const paid={},charged={};NAMES.forEach(n=>{paid[n]=0;charged[n]=0;});
+  bills.forEach(b=>{paid[b.paidBy]=(paid[b.paidBy]||0)+b.amount;NAMES.forEach(n=>charged[n]+=share(b,n));});
+  return NAMES.map(n=>({n,paid:paid[n],charged:charged[n],bal:paid[n]-charged[n]}));
+}
+function settlements(rows){
+  const cred=rows.filter(r=>r.bal>0.5).map(r=>({n:r.n,v:r.bal})).sort((a,b)=>b.v-a.v);
+  const debt=rows.filter(r=>r.bal<-0.5).map(r=>({n:r.n,v:-r.bal})).sort((a,b)=>b.v-a.v);
+  const out=[];let i=0,j=0;
+  while(i<debt.length&&j<cred.length){const x=Math.min(debt[i].v,cred[j].v);
+    if(x>=1) out.push({from:debt[i].n,to:cred[j].n,amt:x});
+    debt[i].v-=x;cred[j].v-=x;if(debt[i].v<0.5)i++;if(cred[j].v<0.5)j++;}
+  return out;
+}
+
+// ---------- render ----------
+function render(){
+  bills.sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+  $("thead").innerHTML='<th class="l">#</th><th class="l">Item</th><th>Amount</th><th class="l">Paid by</th><th class="l">Charged to</th>'+NAMES.map(n=>`<th>${n}</th>`).join("")+'<th></th>';
+  const tb=$("tbody"); tb.textContent="";
+  if(!bills.length){tb.innerHTML=`<tr><td colspan="${NAMES.length+6}" class="empty">No bills yet. Add the first one above.</td></tr>`;}
+  bills.forEach((b,i)=>{
+    const tr=document.createElement("tr"); if(b.hl) tr.className="hl";
+    const who=b.charged.length===NAMES.length?"All 5":b.charged.length===NAMES.length-1?"All except "+NAMES.find(n=>!b.charged.includes(n)):b.charged.join(", ");
+    [["l mono c-num",String(i+1)],["l item",b.item],["c-amt mono",fmt(b.amount)],["l payer",b.paidBy]].forEach(([c,t])=>{const td=document.createElement("td");td.className=c;td.textContent=t;tr.appendChild(td);});
+    const tdw=document.createElement("td");tdw.className="l c-who";const tg=document.createElement("span");tg.className="tag";tg.textContent=who;tdw.appendChild(tg);tr.appendChild(tdw);
+    NAMES.forEach(n=>{const td=document.createElement("td");const s=share(b,n);td.className="share"+(s?"":" zero");td.dataset.label=n;td.textContent=s?fmt(s):"–";tr.appendChild(td);});
+    const act=document.createElement("td");act.className="c-act";
+    const sb=document.createElement("button");sb.className="rowbtn star";sb.textContent="★";sb.setAttribute("aria-pressed",!!b.hl);sb.title=b.hl?"Remove highlight":"Highlight this spend";sb.setAttribute("aria-label",sb.title);
+    sb.onclick=()=>saveBill({...b,hl:!b.hl}).catch(()=>{});
+    const ed=document.createElement("button");ed.className="rowbtn";ed.textContent="Edit";ed.onclick=()=>startEdit(b);
+    const del=document.createElement("button");del.className="rowbtn danger";
+    del.textContent=pendingDelete===b.id?"Confirm delete":"Delete";
+    del.onclick=()=>{if(pendingDelete===b.id){pendingDelete=null;removeBill(b.id);}else{pendingDelete=b.id;render();setTimeout(()=>{if(pendingDelete===b.id){pendingDelete=null;render();}},4000);}};
+    act.append(sb,ed,del);tr.appendChild(act);tb.appendChild(tr);
+  });
+  const rows=balances(); const total=bills.reduce((s,b)=>s+b.amount,0);
+  $("tfoot").innerHTML=`<td class="l blank"></td><td class="l c-tl">Total (${bills.length} bills)</td><td class="c-tt mono">${fmt(total)}</td><td class="blank"></td><td class="blank"></td>`+rows.map(r=>`<td class="share" data-label="${r.n}">${fmt(r.charged)}</td>`).join("")+'<td class="blank"></td>';
+  $("tripTotal").textContent=fmt(total);
+  const hls=bills.filter(b=>b.hl); $("hlTotal").textContent=hls.length?`Highlighted: ${hls.length} bills, ${fmt(hls.reduce((s,b)=>s+b.amount,0))}`:"";
+  const pp=$("people");pp.textContent="";
+  rows.forEach(r=>{const d=document.createElement("div");d.className="person";
+    const st=r.bal>=1?["pos","Gets back "+fmt(r.bal)]:r.bal<=-1?["neg","Owes "+fmt(-r.bal)]:["ok","Settled"];
+    d.innerHTML=`<div class="name"></div><div class="kv">Paid <b>${fmt(r.paid)}</b></div><div class="kv">Charged <b>${fmt(r.charged)}</b></div><div class="status ${st[0]}">${st[1]}</div>`;
+    d.querySelector(".name").textContent=r.n;pp.appendChild(d);});
+  const sl=$("settle");sl.textContent="";const st=settlements(rows);
+  if(!st.length) sl.innerHTML='<li><span class="who">Everyone is even.</span></li>';
+  st.forEach(s=>{const li=document.createElement("li");li.innerHTML=`<span><span class="who">${s.from}</span> <span class="arrow">pays →</span> <span class="who">${s.to}</span></span><span class="amt">${fmt(s.amt)}</span>`;sl.appendChild(li);});
+}
+function startEdit(b){
+  editingId=b.id;$("item").value=b.item;$("amount").value=b.amount;$("paidBy").value=b.paidBy;selected=new Set(b.charged);drawChips();
+  $("formTitle").textContent="Edit bill";$("submitBtn").textContent="Save changes";$("cancelEdit").hidden=false;
+  $("f").scrollIntoView({behavior:"smooth",block:"start"});$("item").focus();
+}
+
+// ---------- Excel export ----------
+async function buildXlsx(){
+  const wb=new ExcelJS.Workbook(); const ws=wb.addWorksheet("Bills",{views:[{state:"frozen",ySplit:1}]});
+  const INR='"₹"#,##0;-"₹"#,##0;"-"'; const n=bills.length; const last=n+1;
+  ws.columns=[{header:"#",width:5},{header:"Item / Work",width:30},{header:"Amount (₹)",width:13},{header:"Paid by",width:12},{header:"Charged to",width:30},...NAMES.map(x=>({header:x,width:12})),{header:"Highlighted",width:12}];
+  const hdr=ws.getRow(1); hdr.font={name:"Arial",bold:true,color:{argb:"FFFFFFFF"}}; hdr.fill={type:"pattern",pattern:"solid",fgColor:{argb:"FF0F6B5A"}}; hdr.alignment={horizontal:"center",vertical:"middle"}; hdr.height=22;
+  bills.forEach((b,i)=>{
+    const r=ws.addRow([i+1,b.item,b.amount,b.paidBy,b.charged.length===NAMES.length?"All 5":b.charged.join(", "),...NAMES.map(x=>share(b,x)),b.hl?"★ Yes":""]);
+    r.font={name:"Arial"};
+    for(let c=3;c<=5+NAMES.length;c++) if(c===3||c>5) r.getCell(c).numFmt=INR;
+    if(b.hl){ r.eachCell({includeEmpty:true},c=>{c.fill={type:"pattern",pattern:"solid",fgColor:{argb:"FFFFE58A"}};}); r.font={name:"Arial",bold:true}; }
+  });
+  const tr=ws.addRow(["",`TOTAL (${n} bills)`,n?{formula:`SUM(C2:C${last})`}:0,"","",...NAMES.map((x,k)=>{const col=String.fromCharCode(70+k);return n?{formula:`SUM(${col}2:${col}${last})`}:0;}),""]);
+  tr.font={name:"Arial",bold:true}; tr.eachCell({includeEmpty:true},c=>{c.fill={type:"pattern",pattern:"solid",fgColor:{argb:"FFE8EEF6"}};c.border={top:{style:"thin"}};});
+  for(let c=3;c<=5+NAMES.length;c++) if(c===3||c>5) tr.getCell(c).numFmt=INR;
+  if(bills.some(b=>b.hl)){ const r=ws.addRow(["","Highlighted spend total",{formula:`SUMIF(K2:K${last},"★ Yes",C2:C${last})`}]); r.font={name:"Arial",bold:true}; r.getCell(3).numFmt=INR; }
+  ws.autoFilter={from:"A1",to:`K${Math.max(last,1)}`};
+  const s=wb.addWorksheet("Summary"); const rows=balances();
+  s.columns=[{width:16},{width:14},{width:14},{width:14},{width:22}];
+  s.addRow(["Trip Bill Split"]).font={name:"Arial",bold:true,size:16}; s.addRow([]);
+  const h=s.addRow(["Friend","Total paid","Total charged","Balance","Status"]); h.font={name:"Arial",bold:true,color:{argb:"FFFFFFFF"}}; h.fill={type:"pattern",pattern:"solid",fgColor:{argb:"FF0F6B5A"}};
+  rows.forEach((r,i)=>{const rr=4+i; const row=s.addRow([r.n,{formula:`SUMIF(Bills!D2:D${last},A${rr},Bills!C2:C${last})`},{formula:`Bills!${String.fromCharCode(70+i)}${last+1}`},{formula:`B${rr}-C${rr}`},r.bal>=1?"Gets back "+fmt(r.bal):r.bal<=-1?"Owes "+fmt(-r.bal):"Settled"]);
+    row.font={name:"Arial"}; [2,3,4].forEach(c=>row.getCell(c).numFmt=INR);});
+  s.addRow([]); s.addRow(["Settle up"]).font={name:"Arial",bold:true,size:13};
+  const st=settlements(rows); if(!st.length) s.addRow(["Everyone is even."]);
+  st.forEach(x=>{const r=s.addRow([x.from,"pays →",x.to,Math.round(x.amt)]); r.getCell(4).numFmt=INR;});
+  return wb.xlsx.writeBuffer();
+}
+$("xlsxBtn").onclick=async()=>{
+  const t=$("toast"); t.textContent="Building Excel file…";
+  try{
+    const buf=await buildXlsx(); const d=new Date();
+    const url=URL.createObjectURL(new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
+    const a=document.createElement("a"); a.href=url; a.download=`Trip_Bills_${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}.xlsx`;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),5000);
+    t.textContent="Excel file downloaded.";
+  }catch(e){ t.textContent="Couldn't make the Excel file. Try again."; }
+};
+
+drawChips(); load();
+</script>
+</body>
+</html>

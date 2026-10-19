@@ -1,0 +1,526 @@
+[
+ {
+  "id": "bmvexk10y9yhe",
+  "item": "Biryani",
+  "amount": 850,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish"
+  ],
+  "createdAt": 1792394750770,
+  "hl": true
+ },
+ {
+  "id": "bmvexkhknz69k",
+  "item": "barbeque",
+  "amount": 2800,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish"
+  ],
+  "createdAt": 1792394772215,
+  "hl": true
+ },
+ {
+  "id": "bmvexmd0h7vce",
+  "item": "suraj spend",
+  "amount": 1790,
+  "paidBy": "Suraj",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792394859617,
+  "hl": false
+ },
+ {
+  "id": "bmvexmwy8owlw",
+  "item": "thsirt",
+  "amount": 800,
+  "paidBy": "Abhiraj",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792394885456,
+  "hl": false
+ },
+ {
+  "id": "bmvexncmp4hi7",
+  "item": "auto",
+  "amount": 250,
+  "paidBy": "Abhiraj",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792394905777,
+  "hl": false
+ },
+ {
+  "id": "bmvexo0gcarjl",
+  "item": "stadium",
+  "amount": 300,
+  "paidBy": "Abhiraj",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792394936652,
+  "hl": false
+ },
+ {
+  "id": "bmvexofmj4m38",
+  "item": "horse riding",
+  "amount": 2000,
+  "paidBy": "Abhiraj",
+  "charged": [
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792394956315,
+  "hl": false
+ },
+ {
+  "id": "bmvexoslkl62g",
+  "item": "park",
+  "amount": 200,
+  "paidBy": "Abhiraj",
+  "charged": [
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792394973128,
+  "hl": false
+ },
+ {
+  "id": "bmvexpe49ig2o",
+  "item": "telescope",
+  "amount": 400,
+  "paidBy": "Abhiraj",
+  "charged": [
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395001017,
+  "hl": false
+ },
+ {
+  "id": "bmvexq1z1g7hb",
+  "item": "other expnse",
+  "amount": 1600,
+  "paidBy": "Abhiraj",
+  "charged": [
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395031933,
+  "hl": false
+ },
+ {
+  "id": "bmvexqdrgqf39",
+  "item": "toy train",
+  "amount": 150,
+  "paidBy": "Abhiraj",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395047212,
+  "hl": false
+ },
+ {
+  "id": "bmvexqx9v0eta",
+  "item": "bday",
+  "amount": 1140,
+  "paidBy": "Nitish",
+  "charged": [
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395072499,
+  "hl": false
+ },
+ {
+  "id": "bmvexrj8pohzb",
+  "item": "other expense",
+  "amount": 2380,
+  "paidBy": "Nitish",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395100969,
+  "hl": false
+ },
+ {
+  "id": "bmvexsk7uorcd",
+  "item": "match ticket",
+  "amount": 19565,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395148890,
+  "hl": false
+ },
+ {
+  "id": "bmvexu8of62t5",
+  "item": "kalka to delhi train",
+  "amount": 4074,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395227247,
+  "hl": false
+ },
+ {
+  "id": "bmvexupoxzagm",
+  "item": "delhi to chandigarh",
+  "amount": 2650,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395249297,
+  "hl": false
+ },
+ {
+  "id": "bmvexv7spxlea",
+  "item": "gaya to delhi",
+  "amount": 4848,
+  "paidBy": "Akash",
+  "charged": [
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395272761,
+  "hl": false
+ },
+ {
+  "id": "bmvexw8u5zxiw",
+  "item": "shimla to dharampur",
+  "amount": 1550,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395320765,
+  "hl": false
+ },
+ {
+  "id": "bmvexwmvj79c5",
+  "item": "agra to gaya",
+  "amount": 1830,
+  "paidBy": "Akash",
+  "charged": [
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395338959,
+  "hl": false
+ },
+ {
+  "id": "bmvexx14odvmx",
+  "item": "ticket cancellation",
+  "amount": 330,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395357432,
+  "hl": false
+ },
+ {
+  "id": "bmvexzrar5p5f",
+  "item": "cab room to station",
+  "amount": 515,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395484659,
+  "hl": false
+ },
+ {
+  "id": "bmvey0rdk1f45",
+  "item": "cab",
+  "amount": 356,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395531416,
+  "hl": false
+ },
+ {
+  "id": "bmvey6qw21u0y",
+  "item": "stadium to room",
+  "amount": 1000,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395810722,
+  "hl": false
+ },
+ {
+  "id": "bmvey7snvqind",
+  "item": "chandigarh to shimla",
+  "amount": 3500,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395859675,
+  "hl": false
+ },
+ {
+  "id": "bmvey856xh4v1",
+  "item": "sunrise cafe",
+  "amount": 260,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395875913,
+  "hl": false
+ },
+ {
+  "id": "bmvey8qnbgwmi",
+  "item": "hotel charges",
+  "amount": 7240,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395903719,
+  "hl": false
+ },
+ {
+  "id": "bmvey9qljn0qk",
+  "item": "other expenditure at 4",
+  "amount": 1295,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395950311,
+  "hl": false
+ },
+ {
+  "id": "bmveya4db5n8g",
+  "item": "cab in shimla",
+  "amount": 2300,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792395968159,
+  "hl": false
+ },
+ {
+  "id": "bmveyavfagx8l",
+  "item": "food and other",
+  "amount": 1265,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792396003222,
+  "hl": false
+ },
+ {
+  "id": "bmveyb7aw2lxu",
+  "item": "malthora store for cake",
+  "amount": 730,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792396018616,
+  "hl": false
+ },
+ {
+  "id": "bmveybybhy8ks",
+  "item": "others",
+  "amount": 200,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792396053629,
+  "hl": false
+ },
+ {
+  "id": "bmveyclnsgk80",
+  "item": "sangram dhabaa 6 oct",
+  "amount": 620,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792396083880,
+  "hl": false
+ },
+ {
+  "id": "bmveydbcvlrr7",
+  "item": "others",
+  "amount": 275,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792396117183,
+  "hl": false
+ },
+ {
+  "id": "bmveydlrrq1cy",
+  "item": "milap dhaba",
+  "amount": 1565,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792396130679,
+  "hl": false
+ },
+ {
+  "id": "bmveyeaj67xja",
+  "item": "cab and other expenses from dharampur to shimla",
+  "amount": 1600,
+  "paidBy": "Akash",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792396162770,
+  "hl": false
+ },
+ {
+  "id": "bmveys4yb2mq8",
+  "item": "other expense",
+  "amount": 1000,
+  "paidBy": "Badal",
+  "charged": [
+   "Akash",
+   "Nitish",
+   "Badal",
+   "Suraj",
+   "Abhiraj"
+  ],
+  "createdAt": 1792396808723,
+  "hl": false
+ }
+]
